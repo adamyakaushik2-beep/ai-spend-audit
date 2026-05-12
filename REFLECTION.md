@@ -1,0 +1,21 @@
+# Reflection
+
+### 1. The hardest bug you hit this week, and how you debugged it
+The most challenging technical hurdle was resolving a module resolution error where the frontend `page.tsx` could not locate the exported `runAudit` function from the `lib` directory. My initial hypothesis was that the Next.js path alias (`@/lib/...`) was not correctly configured in `tsconfig.json`. I began by verifying the compiler options, but even after confirming the paths were correct, the build failed in the Turbopack environment. 
+
+To debug this, I systematically isolated the issue. First, I checked the file exports to ensure the `export` keyword was explicitly defined for every interface and function. I then realized that the environment was struggling with the directory nesting. I moved from an absolute path alias to a relative path (`../lib/...`) to see if the error persisted. This confirmed that the issue was specific to the development server's module mapping. Finally, I discovered that the export was being treated as a default export rather than a named export by the compiler. By standardizing on named exports and restarting the Next.js development process, I cleared the build error. This taught me to look at the module resolution strategy of the build tool (Turbopack) rather than just the code itself.
+
+### 2. A decision you reversed mid-week, and what made you reverse it
+Originally, I intended to build this project with a Python (FastAPI) backend because I am highly proficient in Python and it is my primary language. I had already mapped out the logic for the audit engine in Python. However, mid-week, I reversed this decision and decided to move the entire logic into a Next.js/TypeScript frontend. 
+
+The primary driver for this reversal was the "Product Hunt ready" and "Lighthouse Score" requirements in the assignment. Having a separate backend on Render and a frontend on Vercel would introduce unnecessary latency (TTFB) and potential cold-start issues, which would hurt the Performance score. Additionally, since the audit logic is deterministic (math-based), there was no security-based reason to hide it behind a private API. Moving the logic to TypeScript allowed me to provide "instant" results as the user types, improving the user experience significantly. This trade-off prioritized product "snappiness" and deployment simplicity over my personal comfort with Python, which I believe aligns with the entrepreneurial spirit of shipping the best possible product for the user.
+
+### 3. What you would build in week 2 if you had it
+If I had a second week to iterate on SpendLayer, my first priority would be building the "Benchmark Mode" mentioned in the bonus section. Users love to see how they compare to their peers. I would aggregate anonymized data to show a "Percentile Score"—for example, "You are in the 90th percentile of AI spend for a seed-stage startup." This creates a stronger emotional hook for the user to either brag about their efficiency or fear their overspend.
+
+Secondly, I would implement a real-time "Pricing Scraper." Currently, the tool relies on a static `PRICING_DATA.md` file. In a rapidly evolving market where OpenAI or Anthropic change prices monthly, the tool's value depends on accuracy. I would build a background worker that checks official pricing pages for changes. Lastly, I would integrate a direct "Credex API" or lead-routing system. Instead of a simple email capture, the tool would allow users to instantly see which specific Credex credits apply to their stack, moving them further down the sales funnel automatically.
+
+### 4. How you used AI tools and when they were wrong
+I used AI tools (specifically ChatGPT and Cursor) to accelerate the UI development. I used them to generate the boilerplate Tailwind CSS for the results dashboard and the responsive form layout. This allowed me to focus my manual coding time on the audit engine logic and the data persistence layer. AI is excellent at "standard" UI patterns, and it saved me hours of CSS tweaking.
+
+However, the AI was wrong when it suggested using the
